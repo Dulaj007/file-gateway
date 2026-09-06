@@ -13,7 +13,10 @@ const SNIFF_BYTES = 4100;
 
 export function resolveUploadDir(): string {
   const dir = process.env.UPLOAD_DIR ?? "./uploads";
-  return path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir);
+  // UPLOAD_DIR is deliberately runtime-configurable (SDD §9), so this path
+  // isn't statically analyzable — tell Turbopack not to trace it as a build
+  // dependency (it would otherwise defensively bundle the whole project).
+  return path.isAbsolute(dir) ? dir : path.resolve(/*turbopackIgnore: true*/ process.cwd(), dir);
 }
 
 export async function getStorageUsedBytes(): Promise<bigint> {
