@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "postinstall": "prisma generate",
@@ -33,7 +34,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/busboy": "^1.5.4",
-    "@types/node": "^20",
+    "@types/node": "^22.20.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^17.4.2",
@@ -44,6 +45,7 @@
     "prisma": "^7.10.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.0.0"
   }
 }
