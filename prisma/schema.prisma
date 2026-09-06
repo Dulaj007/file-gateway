@@ -1,0 +1,105 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+model Setting {
+  id Int @id @default(1)
+
+  // --- Site identity & meta (all editable from the dashboard) ---
+  siteName        String @default("FileGateway") // brand shown in header, title, footer
+  siteTagline     String @default("") // short line under the name on the home page
+  metaTitle       String @default("") // <title> / og:title; falls back to siteName
+  metaDescription String @default("") // <meta name=description> / og:description
+  ogImageUrl      String @default("") // social share image (absolute URL)
+  faviconUrl      String @default("") // optional custom favicon
+  themeDefault    String @default("system") // light | dark | system
+  accentColor     String @default("#6366f1") // primary accent used across the UI
+
+  // --- Storage & limits ---
+  storageCapBytes     BigInt @default(32212254720) // 30 GiB
+  imageMaxBytes       BigInt @default(10485760) // 10 MiB
+  videoMaxBytes       BigInt @default(524288000) // 500 MiB
+  zipMaxBytes         BigInt @default(524288000) // 500 MiB
+  ipDailyMaxUploads   Int    @default(20)
+  ipDailyMaxBytes     BigInt @default(1073741824) // 1 GiB / day / IP
+  timerStartSeconds   Int    @default(5)
+  timerArticleSeconds Int    @default(8)
+  timerFinalSeconds   Int    @default(5)
+  defaultExpiry       String @default("7d") // 1d | 7d | 30d | never
+  articleHops         Int    @default(2) // 1 or 2
+  mainDomain          String @default("")
+  article1Domain      String @default("")
+  article2Domain      String @default("")
+  displayDomain       String? // optional pretty-link domain
+  adminSecretPath     String @default("admin") // set at deploy
+
+  updatedAt DateTime @updatedAt
+}
+
+model FileItem {
+  id              String    @id @default(cuid())
+  publicSlug      String    @unique // used in /d/{publicSlug}
+  finalSlug       String    @unique // used in final download page
+  originalName    String
+  storedName      String    @unique // random on-disk filename
+  mimeType        String
+  category        String // "image" | "video" | "zip"
+  sizeBytes       BigInt
+  sha256          String?
+  uploaderIp      String
+  status          String    @default("active") // active | disabled | deleted
+  downloadEnabled Boolean   @default(true)
+  downloadCount   Int       @default(0)
+  createdAt       DateTime  @default(now())
+  expiresAt       DateTime?
+
+  @@index([status, expiresAt])
+  @@index([uploaderIp, createdAt])
+}
+
+model DownloadSession {
+  id          String   @id @default(cuid())
+  fileId      String
+  currentStep Int      @default(1) // 1..(2 + articleHops)
+  nonce       String // rotated every advance (replay defense)
+  visitorIp   String?
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime // short TTL, e.g. now + 20 min
+
+  @@index([expiresAt])
+}
+
+model ArticlePage {
+  id        String   @id @default(cuid())
+  siteKey   String // "article1" | "article2"
+  slug      String
+  title     String
+  body      String // markdown or sanitized HTML
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([siteKey, slug])
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String // upload | download | admin_login | delete | ...
+  detail    String?
+  ip        String?
+  createdAt DateTime @default(now())
+}
