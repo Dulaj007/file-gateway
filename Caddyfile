@@ -1,0 +1,25 @@
+# Caddyfile skeleton (SDD §13) — filled in for real during Phase 10.
+# Replace the placeholder domains below with the values from Settings/.env
+# (MAIN_DOMAIN, ARTICLE1_DOMAIN, ARTICLE2_DOMAIN). All roles are served by
+# the same app instance on 127.0.0.1:3000; Next's own host-aware routing
+# (proxy.ts, Phase 4) decides which "site" renders for a given Host header.
+
+{
+	# email you@example.com   # uncomment + set for Let's Encrypt notices
+}
+
+abc.com {
+	reverse_proxy 127.0.0.1:3000
+	header Strict-Transport-Security "max-age=31536000"
+}
+
+xyz.com, rtx.com {
+	reverse_proxy 127.0.0.1:3000
+	header Strict-Transport-Security "max-age=31536000"
+}
+
+# DISPLAY domain (optional): do NOT blanket-redirect here — the app handles
+# `display/{slug}` -> `MAIN/d/{slug}` itself so slugs map correctly.
+# links.abc.com {
+# 	reverse_proxy 127.0.0.1:3000
+# }

@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FileGateway
 
-## Getting Started
+File hosting with a public upload page, a secret admin dashboard, and a timed
+multi-hop download gateway. Built phase by phase against
+[`file-gateway-SDD.md`](./file-gateway-SDD.md); see [`CLAUDE.md`](./CLAUDE.md)
+for how the build is being run.
 
-First, run the development server:
+Currently at **Phase 0** (scaffold + design system) of 11 — see the phase plan
+in the SDD §12. There is no upload, gateway flow, or admin dashboard yet.
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). A health check is
+available at `/api/health`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Local secrets live in `.env.local` (gitignored). `.env.example` documents
+every variable — see SDD §9.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+- `npm run dev` / `build` / `start` — Next.js dev/build/serve.
+- `npm run lint` — ESLint.
+- `npm run typecheck` — `tsc --noEmit`.
+- `npm run format` / `format:check` — Prettier.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+A full deployment runbook (Caddy, systemd, backups, secret rotation) lands in
+Phase 10.
