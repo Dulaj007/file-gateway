@@ -8,6 +8,7 @@ import { evaluateIpQuota, getClientIp, getIpUsageToday } from "@/lib/ipusage";
 import { getSettings } from "@/lib/settings";
 import { randomSlug } from "@/lib/slug";
 import { getStorageUsedBytes, saveUploadStream, UploadRejected, wouldExceedStorageCap } from "@/lib/storage";
+import { inferProtocol } from "@/lib/url";
 
 type SaveResult = Awaited<ReturnType<typeof saveUploadStream>>;
 
@@ -117,9 +118,7 @@ export async function POST(request: Request) {
     },
   });
 
-  const protocol =
-    request.headers.get("x-forwarded-proto") ??
-    (process.env.NODE_ENV === "production" ? "https" : "http");
+  const protocol = inferProtocol(request);
   const domain = settings.displayDomain || settings.mainDomain;
   const displayLink = `${protocol}://${domain}/d/${publicSlug}`;
 

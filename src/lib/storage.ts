@@ -19,6 +19,10 @@ export function resolveUploadDir(): string {
   return path.isAbsolute(dir) ? dir : path.resolve(/*turbopackIgnore: true*/ process.cwd(), dir);
 }
 
+export function getStoredFilePath(storedName: string): string {
+  return path.join(resolveUploadDir(), storedName);
+}
+
 export async function getStorageUsedBytes(): Promise<bigint> {
   const result = await db.fileItem.aggregate({
     where: { status: "active" },
