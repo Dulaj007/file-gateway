@@ -13,7 +13,8 @@
     "format:check": "prettier --check .",
     "postinstall": "prisma generate",
     "db:seed": "tsx --env-file=.env.local scripts/seed-admin.ts",
-    "db:seed-articles": "tsx --env-file=.env.local scripts/seed-articles.ts"
+    "db:seed-articles": "tsx --env-file=.env.local scripts/seed-articles.ts",
+    "cleanup": "tsx --env-file=.env.local scripts/cleanup.ts"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.10.0",
@@ -27,6 +28,7 @@
     "lucide-react": "^1.41.0",
     "next": "16.3.4",
     "next-themes": "^0.4.6",
+    "node-cron": "^4.6.0",
     "rate-limiter-flexible": "^11.2.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -37,6 +39,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/busboy": "^1.5.4",
     "@types/node": "^22.20.1",
+    "@types/node-cron": "^3.0.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^17.4.2",
