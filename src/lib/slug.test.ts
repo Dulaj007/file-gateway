@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { randomSlug, randomStoredName } from "./slug";
+import { randomSlug, randomStoredName, slugify } from "./slug";
 
 describe("randomSlug", () => {
   it("is URL-safe (no +, /, or =)", () => {
@@ -19,5 +19,19 @@ describe("randomStoredName", () => {
 
   it("strips a leading dot if one is passed", () => {
     expect(randomStoredName(".zip")).toMatch(/^[A-Za-z0-9_-]+\.zip$/);
+  });
+});
+
+describe("slugify", () => {
+  it("lowercases and hyphenates a normal title", () => {
+    expect(slugify("A Five-Minute Morning Routine")).toBe("a-five-minute-morning-routine");
+  });
+
+  it("collapses punctuation and whitespace into single hyphens", () => {
+    expect(slugify("Wait... what?!  Really??")).toBe("wait-what-really");
+  });
+
+  it("trims leading and trailing hyphens", () => {
+    expect(slugify("  -- leading and trailing -- ")).toBe("leading-and-trailing");
   });
 });

@@ -18,6 +18,14 @@ const geistMono = Geist_Mono({
 const THEME_OPTIONS = new Set(["light", "dark", "system"]);
 const HEX_COLOR_RE = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
 
+// Every page reads live branding/settings via getSettings() (siteName,
+// accent color, theme default, meta tags…), which admins can edit at any
+// time from the dashboard. Without this, Next prerenders pages that don't
+// use a request-time API (cookies/headers) as fully static at build time,
+// so a settings change would only show up after the next `next build` —
+// not "on the next page load" as required. Cascades to every nested page.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const title = settings.metaTitle || settings.siteName;
