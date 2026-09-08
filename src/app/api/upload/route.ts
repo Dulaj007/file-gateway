@@ -8,7 +8,7 @@ import { evaluateIpQuota, getClientIp, getIpUsageToday } from "@/lib/ipusage";
 import { getSettings } from "@/lib/settings";
 import { randomSlug } from "@/lib/slug";
 import { getStorageUsedBytes, saveUploadStream, UploadRejected, wouldExceedStorageCap } from "@/lib/storage";
-import { inferProtocol } from "@/lib/url";
+import { buildDisplayLink } from "@/lib/url";
 
 type SaveResult = Awaited<ReturnType<typeof saveUploadStream>>;
 
@@ -118,9 +118,7 @@ export async function POST(request: Request) {
     },
   });
 
-  const protocol = inferProtocol(request);
-  const domain = settings.displayDomain || settings.mainDomain;
-  const displayLink = `${protocol}://${domain}/d/${publicSlug}`;
+  const displayLink = buildDisplayLink(request, settings, publicSlug);
 
   return NextResponse.json({ displayLink, expiresAt });
 }

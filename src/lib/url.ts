@@ -8,3 +8,16 @@ export function inferProtocol(request: Request): string {
     (process.env.NODE_ENV === "production" ? "https" : "http")
   );
 }
+
+// The public gateway-start URL for a file: uses DISPLAY if configured, else
+// MAIN directly (SDD §8's displayLink). Used both by the upload response and
+// the admin files table's "copy link" action.
+export function buildDisplayLink(
+  request: Request,
+  settings: { displayDomain: string | null; mainDomain: string },
+  publicSlug: string
+): string {
+  const protocol = inferProtocol(request);
+  const domain = settings.displayDomain || settings.mainDomain;
+  return `${protocol}://${domain}/d/${publicSlug}`;
+}
