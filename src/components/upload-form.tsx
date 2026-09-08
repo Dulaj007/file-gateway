@@ -14,6 +14,7 @@ export function UploadForm() {
   const [copied, setCopied] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const xhrRef = useRef<XMLHttpRequest | null>(null);
 
   function upload(file: File) {
@@ -22,6 +23,11 @@ export function UploadForm() {
     setError(null);
 
     const formData = new FormData();
+    // Honeypot: real visitors never see or fill this field (see the CSS
+    // below — off-screen, not display:none/hidden, since some bots
+    // specifically skip those to avoid detection). A filled value means
+    // whatever submitted this wasn't a human using the page as designed.
+    formData.append("website", honeypotRef.current?.value ?? "");
     formData.append("file", file);
 
     const xhr = new XMLHttpRequest();
@@ -148,6 +154,15 @@ export function UploadForm() {
           className="hidden"
           disabled={state === "uploading"}
           onChange={(e) => handleFiles(e.target.files)}
+        />
+        <input
+          ref={honeypotRef}
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute left-[-9999px] h-0 w-0 opacity-0"
         />
       </div>
 

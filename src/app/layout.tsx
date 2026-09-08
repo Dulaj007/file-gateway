@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getSettings } from "@/lib/settings";
@@ -48,6 +49,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const settings = await getSettings();
   const defaultTheme = THEME_OPTIONS.has(settings.themeDefault) ? settings.themeDefault : "system";
   const accentColor = HEX_COLOR_RE.test(settings.accentColor) ? settings.accentColor : "#6366f1";
+  // Set by proxy.ts on every request (see its CSP comment) — next-themes'
+  // no-flash script is inline, so it needs the same nonce the CSP header
+  // allows or script-src's strict-dynamic policy would block it.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <html
@@ -57,7 +62,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       style={{ "--accent": accentColor } as CSSProperties}
     >
       <body className="min-h-full flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme={defaultTheme} enableSystem>
+        <ThemeProvider attribute="class" defaultTheme={defaultTheme} enableSystem nonce={nonce}>
           {children}
         </ThemeProvider>
       </body>

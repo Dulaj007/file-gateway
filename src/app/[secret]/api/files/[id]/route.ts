@@ -1,9 +1,11 @@
 import { rm } from "node:fs/promises";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { logAudit } from "@/lib/audit";
 import { requireAdminApi } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { serializeFile } from "@/lib/files";
+import { getClientIp } from "@/lib/ipusage";
 import { getStoredFilePath } from "@/lib/storage";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -54,6 +56,7 @@ export async function DELETE(request: Request, context: RouteContext<"/[secret]/
 
   await rm(getStoredFilePath(file.storedName), { force: true });
   await db.fileItem.delete({ where: { id } });
+  await logAudit("delete", file.originalName, getClientIp(request));
 
   return NextResponse.json({ ok: true });
 }

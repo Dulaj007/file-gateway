@@ -1,6 +1,7 @@
 import argon2 from "argon2";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { logAudit } from "@/lib/audit";
 import { createAdminSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getClientIp } from "@/lib/ipusage";
@@ -59,5 +60,6 @@ export async function POST(request: Request, context: RouteContext<"/[secret]/ap
   }
 
   const session = await createAdminSession(admin.username);
+  await logAudit("admin_login", admin.username, ip);
   return NextResponse.json({ ok: true, csrfToken: session.csrfToken });
 }
