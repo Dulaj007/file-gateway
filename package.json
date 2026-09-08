@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "postinstall": "prisma generate",
-    "db:seed": "tsx --env-file=.env.local scripts/seed-admin.ts"
+    "db:seed": "tsx --env-file=.env.local scripts/seed-admin.ts",
+    "db:seed-articles": "tsx --env-file=.env.local scripts/seed-articles.ts"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.10.0",
@@ -29,6 +30,7 @@
     "rate-limiter-flexible": "^11.2.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "react-markdown": "^10.1.0",
     "zod": "^4.5.4"
   },
   "devDependencies": {

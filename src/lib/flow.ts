@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { articleSiteForStep, pickRandomActiveArticleSlug } from "@/lib/articles";
 import { getSettings } from "@/lib/settings";
 import { randomSlug } from "@/lib/slug";
 import {
@@ -8,7 +9,7 @@ import {
   verifyStepToken,
   type StepTokenPayload,
 } from "@/lib/tokens";
-import type { DownloadSession, FileItem } from "@/generated/prisma/client";
+import type { DownloadSession, FileItem, Setting } from "@/generated/prisma/client";
 
 const SESSION_TTL_MS = 20 * 60 * 1000; // SDD §6: "short TTL, e.g. now + 20 min"
 
@@ -18,20 +19,15 @@ export function isFileDownloadable(file: FileItem): boolean {
   return true;
 }
 
-async function totalSteps(): Promise<number> {
-  const settings = await getSettings();
+function totalSteps(settings: Setting): number {
   return 2 + settings.articleHops;
 }
 
 // Hop/final/file URLs are all built from the *configured* domain (Setting
-// row), not the host the current request happened to arrive on — the same
-// reasoning as displayLink in the upload route. For now every step resolves
-// to mainDomain since there's no real article theming/routing yet (Phase 4);
-// once it exists, only this function needs to change to pick
-// article1Domain/article2Domain per step.
-async function mainOrigin(protocol: string): Promise<string> {
-  const settings = await getSettings();
-  return `${protocol}://${settings.mainDomain}`;
+// row), not the host the current request happened to arrive on — the article
+// hops in particular must cross to a genuinely different domain.
+function originFor(protocol: string, domain: string): string {
+  return `${protocol}://${domain}`;
 }
 
 // Mints the token + URL for whatever comes after `newStep` was just written
@@ -42,16 +38,28 @@ async function issueNextHop(
   session: DownloadSession,
   newStep: number,
   newNonce: string
-): Promise<string> {
-  const total = await totalSteps();
+): Promise<{ ok: true; url: string } | { ok: false; reason: string }> {
+  const settings = await getSettings();
+  const total = totalSteps(settings);
   const token = await signStepToken({ sid: session.id, step: newStep, nonce: newNonce });
-  const origin = await mainOrigin(protocol);
 
   if (newStep >= total) {
     const file = await db.fileItem.findUniqueOrThrow({ where: { id: session.fileId } });
-    return `${origin}/dl/${file.finalSlug}?g=${token}`;
+    const origin = originFor(protocol, settings.mainDomain);
+    return { ok: true, url: `${origin}/dl/${file.finalSlug}?g=${token}` };
   }
-  return `${origin}/hop/${newStep}?g=${token}`;
+
+  const siteKey = articleSiteForStep(newStep);
+  const articleSlug = await pickRandomActiveArticleSlug(siteKey);
+  if (!articleSlug) {
+    // Misconfiguration (no active articles for this site) — not something a
+    // visitor caused, but the flow genuinely cannot continue.
+    return { ok: false, reason: "This link is temporarily unavailable. Please try again later." };
+  }
+
+  const domain = siteKey === "article1" ? settings.article1Domain : settings.article2Domain;
+  const origin = originFor(protocol, domain);
+  return { ok: true, url: `${origin}/article/${articleSlug}?g=${token}` };
 }
 
 export type PeekResult =
@@ -116,7 +124,9 @@ export async function startSession(
     data: { currentStep: newStep, nonce: newNonce },
   });
 
-  return { ok: true, nextUrl: await issueNextHop(protocol, session, newStep, newNonce) };
+  const hop = await issueNextHop(protocol, session, newStep, newNonce);
+  if (!hop.ok) return hop;
+  return { ok: true, nextUrl: hop.url };
 }
 
 export async function advanceSession(
@@ -133,19 +143,21 @@ export async function advanceSession(
     data: { currentStep: newStep, nonce: newNonce },
   });
 
-  return { ok: true, nextUrl: await issueNextHop(protocol, peek.session, newStep, newNonce) };
+  const hop = await issueNextHop(protocol, peek.session, newStep, newNonce);
+  if (!hop.ok) return hop;
+  return { ok: true, nextUrl: hop.url };
 }
 
 export async function completeSession(
   protocol: string,
   token: string
 ): Promise<{ ok: true; downloadUrl: string } | { ok: false; reason: string }> {
-  const total = await totalSteps();
-  const peek = await peekSession(token, total);
+  const settings = await getSettings();
+  const peek = await peekSession(token, totalSteps(settings));
   if (!peek.ok) return { ok: false, reason: "This link is invalid or has expired." };
 
   const dlToken = await signDownloadToken({ sid: peek.session.id, fileId: peek.session.fileId });
-  const origin = await mainOrigin(protocol);
+  const origin = originFor(protocol, settings.mainDomain);
   return { ok: true, downloadUrl: `${origin}/api/file/${peek.session.fileId}?dl=${dlToken}` };
 }
 
