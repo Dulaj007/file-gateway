@@ -1,6 +1,6 @@
 # File Upload & Multi-Hop Download Gateway — Software Design Document (SDD)
 
-> A single-VPS file hosting site with a public upload page, a secret admin dashboard, and a multi-domain "download gateway" flow (start → article 1 → article 2 → final download). Written as a build spec for Claude Code, broken into phases with acceptance criteria.
+> A single-VPS file hosting site with a public upload page, a secret admin dashboard, and a multi-domain "download gateway" flow (start → article 1 → article 2 → final download). Written as a build spec, broken into phases with acceptance criteria.
 
 ---
 
@@ -121,7 +121,7 @@ sequenceDiagram
 
 | Concern | Choice | Why |
 |--------|--------|-----|
-| Runtime | Node.js 20 LTS + TypeScript | Broad support, great Claude Code fit. |
+| Runtime | Node.js 20 LTS + TypeScript | Broad support, strong tooling. |
 | Framework | **Next.js 14+ (App Router)** | One app for public site + admin + API + host-aware article sites. |
 | DB | SQLite + **Prisma** | Zero-ops for single VPS; migrations built in. |
 | Auth | Cookie sessions via **iron-session**, password hashed with **argon2** | Simple, secure, single hardcoded admin. |

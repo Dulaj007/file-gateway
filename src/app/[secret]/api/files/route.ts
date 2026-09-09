@@ -14,8 +14,8 @@ const querySchema = z.object({
   page: z.coerce.number().int().positive().catch(1),
   category: z.enum(["image", "video", "zip"]).optional(),
   // A derived, display-oriented status rather than the raw (and, in this
-  // app, always-"active") FileItem.status column — see CLAUDE.md's Phase 6
-  // note on why downloadEnabled/expiresAt drive this instead.
+  // app, always-"active") FileItem.status column — downloadEnabled/expiresAt
+  // drive this instead, since those are what admin mutations actually set.
   status: z.enum(["active", "disabled", "expired"]).optional(),
 });
 

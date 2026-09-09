@@ -43,8 +43,8 @@ function withSecurityHeaders(response: NextResponse, nonce: string): NextRespons
 }
 
 // Next.js 16 renamed `middleware.ts`/`export function middleware` to
-// `proxy.ts`/`export function proxy` — see CLAUDE.md's framework-version
-// note. Same host-based routing behavior the SDD describes for `middleware.ts`.
+// `proxy.ts`/`export function proxy`. Same host-based routing behavior the
+// SDD describes for `middleware.ts`.
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 

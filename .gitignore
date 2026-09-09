@@ -24,8 +24,12 @@
 .DS_Store
 *.pem
 
-# local Claude Code session state (lock files etc., not project content)
+# local AI-assistant session state (lock files etc., not project content)
 /.claude/
+
+# internal build-process docs — not part of the public project
+/CLAUDE.md
+/AGENTS.md
 
 # debug
 npm-debug.log*
@@ -54,3 +58,6 @@ next-env.d.ts
 # local upload storage — never commit uploaded files
 /uploads/*
 !/uploads/.gitkeep
+
+# staged GitHub issue bodies (not project content, delete after use)
+/github-issues/
