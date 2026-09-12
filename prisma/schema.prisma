@@ -36,6 +36,7 @@ model Setting {
   mainDomain          String @default("")
   article1Domain      String @default("")
   article2Domain      String @default("")
+  middleDomain        String @default("") // hosts the start + final gateway pages (e.g. upTimer)
   displayDomain       String? // optional pretty-link domain
   adminSecretPath     String @default("admin") // set at deploy
 

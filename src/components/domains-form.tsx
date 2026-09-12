@@ -8,7 +8,12 @@ import type { SerializedSettings } from "@/lib/settings";
 
 type DomainFields = Pick<
   SerializedSettings,
-  "mainDomain" | "article1Domain" | "article2Domain" | "displayDomain" | "adminSecretPath"
+  | "mainDomain"
+  | "article1Domain"
+  | "article2Domain"
+  | "middleDomain"
+  | "displayDomain"
+  | "adminSecretPath"
 >;
 
 const label = "text-sm font-medium text-fg";
@@ -132,6 +137,14 @@ export function DomainsForm({ secret }: { secret: string }) {
             value={form.article2Domain}
             onChange={(e) => set("article2Domain", e.target.value)}
             placeholder="blog-two.example"
+          />
+        </Field>
+        <Field label="Middle domain (optional)">
+          <input
+            className={input}
+            value={form.middleDomain}
+            onChange={(e) => set("middleDomain", e.target.value)}
+            placeholder="Hosts start + final pages; blank falls back to main domain"
           />
         </Field>
         <Field label="Display domain (optional)">

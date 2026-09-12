@@ -20,6 +20,7 @@ export async function getSettings(): Promise<Setting> {
       mainDomain: process.env.MAIN_DOMAIN ?? "",
       article1Domain: process.env.ARTICLE1_DOMAIN ?? "",
       article2Domain: process.env.ARTICLE2_DOMAIN ?? "",
+      middleDomain: process.env.MIDDLE_DOMAIN ?? "",
       displayDomain: process.env.DISPLAY_DOMAIN || null,
       adminSecretPath: process.env.ADMIN_SECRET_PATH ?? "admin",
     },
@@ -55,6 +56,7 @@ export function serializeSettings(settings: Setting) {
     mainDomain: settings.mainDomain,
     article1Domain: settings.article1Domain,
     article2Domain: settings.article2Domain,
+    middleDomain: settings.middleDomain,
     displayDomain: settings.displayDomain,
     adminSecretPath: settings.adminSecretPath,
   };

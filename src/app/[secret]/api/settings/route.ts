@@ -34,6 +34,7 @@ const bodySchema = z.object({
   mainDomain: z.string().trim().optional(),
   article1Domain: z.string().trim().optional(),
   article2Domain: z.string().trim().optional(),
+  middleDomain: z.string().trim().optional(),
   displayDomain: z.string().trim().nullable().optional(),
   adminSecretPath: z
     .string()

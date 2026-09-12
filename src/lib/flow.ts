@@ -45,7 +45,10 @@ async function issueNextHop(
 
   if (newStep >= total) {
     const file = await db.fileItem.findUniqueOrThrow({ where: { id: session.fileId } });
-    const origin = originFor(protocol, settings.mainDomain);
+    // The final page lives on the middle site (e.g. upTimer), not MAIN — MAIN
+    // is upload/admin only and isn't part of the visible flow. Falls back to
+    // mainDomain if middleDomain isn't configured yet.
+    const origin = originFor(protocol, settings.middleDomain || settings.mainDomain);
     return { ok: true, url: `${origin}/dl/${file.finalSlug}?g=${token}` };
   }
 
