@@ -35,4 +35,22 @@ describe("matchOrigin", () => {
       "http://uptimer.example"
     );
   });
+
+  it("matches against any domain in an array (e.g. gate/check shared by two article sites)", () => {
+    const domains = ["cosmira.example", "veloura.example"];
+    expect(matchOrigin(requestWithOrigin("https://veloura.example"), domains)).toBe(
+      "https://veloura.example"
+    );
+    expect(matchOrigin(requestWithOrigin("https://cosmira.example"), domains)).toBe(
+      "https://cosmira.example"
+    );
+    expect(matchOrigin(requestWithOrigin("https://evil.example"), domains)).toBeNull();
+  });
+
+  it("filters out empty strings from an array of not-yet-configured domains", () => {
+    expect(matchOrigin(requestWithOrigin("https://cosmira.example"), ["", "cosmira.example"])).toBe(
+      "https://cosmira.example"
+    );
+    expect(matchOrigin(requestWithOrigin("https://cosmira.example"), ["", ""])).toBeNull();
+  });
 });

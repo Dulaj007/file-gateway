@@ -62,7 +62,9 @@ async function issueNextHop(
 
   const domain = siteKey === "article1" ? settings.article1Domain : settings.article2Domain;
   const origin = originFor(protocol, domain);
-  return { ok: true, url: `${origin}/article/${articleSlug}?g=${token}` };
+  // Standalone article sites (e.g. Cosmira, Veloura) serve posts at their
+  // root, not under an /article/ prefix — matches a real blog's URL shape.
+  return { ok: true, url: `${origin}/${articleSlug}?g=${token}` };
 }
 
 export type PeekResult =

@@ -7,12 +7,16 @@ import { NextResponse } from "next/server";
 // SDD's "CORS locked to article domains" requirement. Returns the exact
 // origin to echo back (required for a non-wildcard Access-Control-Allow-Origin)
 // or null if the request's Origin doesn't match the configured domain.
-export function matchOrigin(request: Request, allowedDomain: string): string | null {
-  if (!allowedDomain) return null;
+export function matchOrigin(request: Request, allowedDomains: string | string[]): string | null {
+  const domains = (Array.isArray(allowedDomains) ? allowedDomains : [allowedDomains]).filter(Boolean);
+  if (domains.length === 0) return null;
+
   const origin = request.headers.get("origin");
   if (!origin) return null;
+
   try {
-    return new URL(origin).host === allowedDomain ? origin : null;
+    const host = new URL(origin).host;
+    return domains.includes(host) ? origin : null;
   } catch {
     return null;
   }
