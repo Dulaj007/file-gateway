@@ -28,6 +28,7 @@ model Setting {
   zipMaxBytes         BigInt @default(524288000) // 500 MiB
   ipDailyMaxUploads   Int    @default(20)
   ipDailyMaxBytes     BigInt @default(1073741824) // 1 GiB / day / IP
+  bandwidthLimitKBps  Int    @default(200) // per-transfer upload/download throughput cap, KB/s; 0 = unlimited
   timerStartSeconds   Int    @default(5)
   timerArticleSeconds Int    @default(8)
   timerFinalSeconds   Int    @default(5)

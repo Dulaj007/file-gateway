@@ -76,11 +76,15 @@ export async function POST(request: Request) {
         sawFile = true;
         originalName = info.filename || originalName;
 
-        saveUploadStream(fileStream, {
-          image: Number(settings.imageMaxBytes),
-          video: Number(settings.videoMaxBytes),
-          zip: Number(settings.zipMaxBytes),
-        })
+        saveUploadStream(
+          fileStream,
+          {
+            image: Number(settings.imageMaxBytes),
+            video: Number(settings.videoMaxBytes),
+            zip: Number(settings.zipMaxBytes),
+          },
+          settings.bandwidthLimitKBps
+        )
           .then(resolve)
           .catch(reject);
       });

@@ -3,6 +3,7 @@ import { logAudit } from "@/lib/audit";
 import { redeemDownloadToken } from "@/lib/flow";
 import { streamFileResponse } from "@/lib/file-stream";
 import { getClientIp } from "@/lib/ipusage";
+import { getSettings } from "@/lib/settings";
 
 export async function GET(request: Request, context: RouteContext<"/api/file/[id]">) {
   const { id } = await context.params;
@@ -18,5 +19,6 @@ export async function GET(request: Request, context: RouteContext<"/api/file/[id
 
   await logAudit("download", result.file.originalName, getClientIp(request));
 
-  return streamFileResponse(request, result.file);
+  const settings = await getSettings();
+  return streamFileResponse(request, result.file, settings.bandwidthLimitKBps);
 }

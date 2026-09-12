@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { streamFileResponse } from "@/lib/file-stream";
+import { getSettings } from "@/lib/settings";
 
 // Admin quick-download: bypasses the gateway entirely (SDD §6). Works
 // regardless of downloadEnabled/expiresAt/status — those gate *public*
@@ -20,5 +21,6 @@ export async function GET(
     return NextResponse.json({ error: "File not found." }, { status: 404 });
   }
 
-  return streamFileResponse(request, file);
+  const settings = await getSettings();
+  return streamFileResponse(request, file, settings.bandwidthLimitKBps);
 }

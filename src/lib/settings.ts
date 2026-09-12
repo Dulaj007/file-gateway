@@ -48,6 +48,7 @@ export function serializeSettings(settings: Setting) {
     zipMaxBytes: Number(settings.zipMaxBytes),
     ipDailyMaxUploads: settings.ipDailyMaxUploads,
     ipDailyMaxBytes: Number(settings.ipDailyMaxBytes),
+    bandwidthLimitKBps: settings.bandwidthLimitKBps,
     timerStartSeconds: settings.timerStartSeconds,
     timerArticleSeconds: settings.timerArticleSeconds,
     timerFinalSeconds: settings.timerFinalSeconds,

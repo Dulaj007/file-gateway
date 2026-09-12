@@ -6,6 +6,7 @@ import type { Readable } from "node:stream";
 import { db } from "@/lib/db";
 import { detectCategory, type UploadCategory } from "@/lib/filetype";
 import { randomStoredName } from "@/lib/slug";
+import { createThrottle } from "@/lib/throttle";
 
 // file-type's own guidance: a few KB is enough to reliably identify any
 // supported format from its magic bytes.
@@ -69,7 +70,8 @@ export type SavedUpload = {
 // stream via the iterator's return(), which would abort the upload.
 export async function saveUploadStream(
   fileStream: Readable,
-  maxBytesByCategory: Record<UploadCategory, number>
+  maxBytesByCategory: Record<UploadCategory, number>,
+  bandwidthLimitKBps = 0
 ): Promise<SavedUpload> {
   const uploadDir = resolveUploadDir();
   await mkdir(uploadDir, { recursive: true });
@@ -102,6 +104,7 @@ export async function saveUploadStream(
 
   const hash = createHash("sha256");
   const writeStream = createWriteStream(filePath);
+  const wait = createThrottle(bandwidthLimitKBps * 1024);
   let totalBytes = 0;
 
   async function writeChunk(chunk: Buffer) {
@@ -113,6 +116,7 @@ export async function saveUploadStream(
     if (!writeStream.write(chunk)) {
       await new Promise<void>((resolve) => writeStream.once("drain", () => resolve()));
     }
+    await wait(chunk.length);
   }
 
   try {

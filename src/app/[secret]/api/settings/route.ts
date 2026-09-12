@@ -25,6 +25,8 @@ const bodySchema = z.object({
   zipMaxBytes: positiveInt.optional(),
   ipDailyMaxUploads: positiveInt.optional(),
   ipDailyMaxBytes: positiveInt.optional(),
+  // 0 is a valid value here (unlimited/disabled), unlike the other limits.
+  bandwidthLimitKBps: z.number().int().nonnegative().optional(),
   timerStartSeconds: positiveInt.optional(),
   timerArticleSeconds: positiveInt.optional(),
   timerFinalSeconds: positiveInt.optional(),

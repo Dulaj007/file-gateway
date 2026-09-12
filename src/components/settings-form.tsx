@@ -27,6 +27,7 @@ type LimitsFields = Pick<
   | "zipMaxBytes"
   | "ipDailyMaxUploads"
   | "ipDailyMaxBytes"
+  | "bandwidthLimitKBps"
   | "timerStartSeconds"
   | "timerArticleSeconds"
   | "timerFinalSeconds"
@@ -396,6 +397,15 @@ function LimitsSection({
             className={input}
             value={Math.round((form.ipDailyMaxBytes / MB) * 100) / 100}
             onChange={(e) => set("ipDailyMaxBytes", Math.round(Number(e.target.value) * MB))}
+          />
+        </Field>
+        <Field label="Upload/download speed limit (KB/s, 0 = unlimited)">
+          <input
+            type="number"
+            min={0}
+            className={input}
+            value={form.bandwidthLimitKBps}
+            onChange={(e) => set("bandwidthLimitKBps", Math.max(0, Math.round(Number(e.target.value))))}
           />
         </Field>
         <Field label="Start-page timer (s)">
